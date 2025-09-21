@@ -12,7 +12,6 @@ def get(name,dataset1,dataset2,dataset3):
     d2=load_dataset(dataset2,split="train")
     d3=load_dataset(dataset3,split="train")
     return model, tokenizer, d1, d2, d3
-
 def preprocess(thinks, tokenizer):
     if 'text' in thinks:
         return tokenizer(thinks.get('text', ''),truncation=True,max_length=512)
@@ -20,7 +19,20 @@ def preprocess(thinks, tokenizer):
         return tokenizer(thinks.get('prompt', '')+" "+thinks.get('completion', ''),truncation=True,max_length=512)
     else:
         return{"input_ids":[],"attention_mask":[]}
-
+def numberdataset(number,name):
+    co=0
+    d133=[]
+    moName=name
+    moName=AutoModelForCausalLM(moName)
+    tokenizer3=AutoTokenizer.from_pretrained(moName)
+    while co!=number:
+        datasetnameos=input("please give the dataset name")
+        d133.append(datasetnameos)
+        co+=1
+    for a in d133:
+        d13=load_dataset(a,split="train")
+        d13tokenized=d13.map(lambda x: preprocess(x, tokenizer3),batched=True)
+        concaDatas=concatenate_datasets([d13tokenized])
 def tokenize(d1, d2, d3, tokenizer):
     tokenized_dataset1=d1.map(lambda x: preprocess(x, tokenizer),batched=True)
     tokenized_dataset2=d2.map(lambda x: preprocess(x, tokenizer),batched=True)
@@ -48,13 +60,15 @@ def train(model, tokenizer, combined_dataset, dirname,per_device_batch_size,num_
 
 if __name__ == '__main__':
     modella=input("please give the model name")
-    dta1=input("please give the first dataset")
-    dta2=input("please give the second dataset")
-    dta3=input("please give the third dataset")
-    model, tokenizer, d1, d2, d3 = get(modella,dta1,dta2,dta3)
-    
-    combined_dataset = tokenize(d1, d2, d3, tokenizer)
-    
+    numberere=input("please give the dataset count")
+    if numberere==3:
+        dta1=input("please give the first dataset")
+        dta2=input("please give the second dataset")
+        dta3=input("please give the third dataset")
+        model, tokenizer, d1, d2, d3 = get(modella,dta1,dta2,dta3)
+        combined_dataset = tokenize(d1, d2, d3, tokenizer)
+    else:
+        combined_dataset=numberdataset(numberere,modella)
     diras=input("please give the dirname of model")
     device_batch=int(input("please give the per_device_batch_size"))
     num=int(input("please give the num_train_epochs"))
